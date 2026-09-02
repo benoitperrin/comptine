@@ -29,7 +29,13 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+mcp = [
+    "mcp[cli]>=1.2,<2.0",
+    "uvicorn>=0.30",
+]
 dev = [
+    "mcp[cli]>=1.2,<2.0",
+    "uvicorn>=0.30",
     "pytest>=8.0",
     "pytest-cov>=5.0",
     "pytest-httpx>=0.30",
@@ -40,6 +46,7 @@ dev = [
 
 [project.scripts]
 comptine = "comptine.cli:main"
+comptine-mcp = "comptine.mcp_server:main"
 
 [project.urls]
 Repository = "https://github.com/benoitperrin/comptine"

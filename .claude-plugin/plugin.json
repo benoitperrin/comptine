@@ -1,0 +1,9 @@
+{
+  "name": "comptine",
+  "description": "Déclarer la garde d'enfants à domicile à l'Urssaf (Pajemploi) : estimation, prédéclaration, déclaration sous mandat de tierce déclaration.",
+  "version": "0.1.0",
+  "author": { "name": "Benoît Perrin" },
+  "homepage": "https://github.com/benoitperrin/comptine",
+  "repository": "https://github.com/benoitperrin/comptine",
+  "license": "MIT"
+}

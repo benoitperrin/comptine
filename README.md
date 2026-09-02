@@ -123,6 +123,61 @@ prend la colonne « Heures effectives » du tableur.
 Une déclaration engage des cotisations réelles et ne se modifie en ligne que pendant un mois.
 Si vous branchez ce client sur un agent, gardez `declarer` derrière une confirmation humaine.
 
+## Depuis un assistant : MCP, plugin, connecteur
+
+Le dépôt embarque un serveur MCP, `comptine-mcp`, qui expose huit outils : état,
+vérifications de l'employeur, du salarié et des enfants ouvrant droit, estimation,
+aperçu du corps, prédéclaration et déclaration.
+
+Trois verrous, parce qu'une déclaration engage des cotisations réelles :
+
+- **aucun outil n'accepte d'employeur en paramètre.** Il est résolu côté serveur, à
+  partir de la configuration en local ou du compte appelant en mode hébergé. Un test
+  d'invariant relit le code source et échoue si un paramètre d'employeur réapparaît ;
+- **`declarer` exige le jeton rendu par `predeclarer`**, qui est l'empreinte du corps
+  exact. Si quoi que ce soit a changé depuis, la déclaration est refusée ;
+- **le mandat n'est pas exposé.** C'est un acte juridique qui suit un mandat signé,
+  posé à la main.
+
+Chaque appel est journalisé en JSON-lines (`COMPTINE_AUDIT_LOG` pour choisir où).
+
+### En local
+
+Comme plugin Claude Code ou Cowork, le dépôt est lui-même le plugin :
+
+```bash
+claude --plugin-dir /chemin/vers/comptine
+```
+
+Pour tout autre client MCP, la commande est `comptine-mcp` en stdio. Chez Codex :
+
+```bash
+codex mcp add comptine -- uvx --from "comptine[mcp] @ git+https://github.com/benoitperrin/comptine" comptine-mcp
+```
+
+Avec plusieurs employeurs en configuration, `COMPTINE_EMPLOYEUR` désigne celui sur
+lequel le serveur agit.
+
+### Hébergé, pour donner un accès à quelqu'un
+
+Le serveur se sert aussi en HTTP. La personne n'installe rien : elle ajoute l'URL comme
+connecteur personnalisé dans Claude, sur n'importe quel plan, depuis le web, Desktop,
+Cowork ou mobile.
+
+```bash
+comptine-mcp --nouveau-compte "Claire Dupont" --employeur claire   # rend un jeton, une fois
+comptine-mcp --http --port 8787
+```
+
+Le jeton n'est jamais stocké : la configuration ne garde que son empreinte SHA-256, et
+un compte est lié à un employeur et un seul. Sans jeton valide, le serveur refuse —
+il échoue fermé, il ne retombe jamais sur un employeur par défaut. `peut_declarer`
+vaut `false` par défaut : un compte lit et estime, il ne dépose pas.
+
+⚠️ Héberger ce service, c'est déclarer pour autrui : le mandat écrit préalable est
+exigé par l'article R133-43 du code de la sécurité sociale, et l'Urssaf renvoie vers le
+tiers déclarant toute contestation.
+
 ## Vous n'avez pas d'accès et vous voulez quand même passer par l'API
 
 Sépharée SAS est référencée comme tiers déclarant et peut déposer les déclarations d'un

@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "comptine": {
+      "command": "uvx",
+      "args": [
+        "--from",
+        "comptine[mcp] @ git+https://github.com/benoitperrin/comptine",
+        "comptine-mcp"
+      ]
+    }
+  }
+}

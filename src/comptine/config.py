@@ -1,4 +1,4 @@
-"""Configuration loading for pajemploi.
+"""Configuration loading for comptine.
 
 Configuration lives in ``~/.config/comptine/config.json`` (mode 600), with a fallback to
 ``~/.config/pajemploi/`` for installations that predate the rename. Environments
@@ -95,6 +95,31 @@ class Salarie(BaseModel):
     sheet_tab: str = "Suivi"
 
 
+class Compte(BaseModel):
+    """One remote MCP account: one person, one employer, nothing else.
+
+    The whole security model of the hosted server rests on this object. The
+    third-party declarant holds a single set of Acoss credentials that can reach
+    **every** employer who granted a mandate, so the employer a call acts on is
+    resolved from the caller's account — never from a tool argument.
+    """
+
+    model_config = ConfigDict(extra="forbid")
+    token_sha256: str = Field(
+        description="SHA-256 of the bearer token, hex-encoded. The token itself is never stored."
+    )
+    employeur: str = Field(description="Handle in ``particuliers_employeurs``. Exactly one.")
+    salaries: list[str] = Field(
+        default_factory=list,
+        description="Handles this account may act on; empty means every salarié of its employer.",
+    )
+    libelle: str | None = None
+    peut_declarer: bool = Field(
+        default=False,
+        description="Whether this account may call the real declaration. Off by default.",
+    )
+
+
 class Config(BaseModel):
     model_config = ConfigDict(extra="forbid")
     env: Environment = Environment.SANDBOX
@@ -102,6 +127,10 @@ class Config(BaseModel):
     tiers_declarant: TiersDeclarant
     particuliers_employeurs: dict[str, ParticulierEmployeur] = Field(default_factory=dict)
     salaries: dict[str, Salarie] = Field(default_factory=dict)
+    comptes: dict[str, Compte] = Field(
+        default_factory=dict,
+        description="Accounts of the hosted MCP server. Unused in local (stdio) mode.",
+    )
     google_credentials_path: str | None = None
     http_timeout_seconds: float = 30.0
 
