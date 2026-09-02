@@ -232,7 +232,14 @@ def _default(obj: Any) -> Any:
     raise TypeError(f"Cannot serialise {type(obj).__name__}")
 
 
-def _error(e: Exception) -> str:
+def _error(e: Exception, tool: str) -> str:
+    """Render an error as data — and record it.
+
+    A refusal is exactly what one wants to find in the log afterwards: it is the
+    trace of someone reaching for a household that is not theirs. Successes alone
+    would make the journal useless for that.
+    """
+    _audit(tool, refus=type(e).__name__, message=str(e)[:400])
     if isinstance(e, ApiError):
         return _json({"erreur": e.to_dict()})
     return _json({"erreur": {"type": type(e).__name__, "message": str(e)}})
@@ -278,7 +285,7 @@ def build_server(cfg: Config, *, hosted: bool = False) -> Any:  # noqa: PLR0915 
                 }
             )
         except Exception as e:
-            return _error(e)
+            return _error(e, "comptine_etat")
 
     @mcp.tool()
     def comptine_verifier_employeur() -> str:
@@ -293,7 +300,7 @@ def build_server(cfg: Config, *, hosted: bool = False) -> Any:  # noqa: PLR0915 
             _audit("verifier_employeur")
             return _json(out)
         except Exception as e:
-            return _error(e)
+            return _error(e, "comptine_verifier_employeur")
 
     @mcp.tool()
     def comptine_verifier_salarie(salarie: str) -> str:
@@ -309,7 +316,7 @@ def build_server(cfg: Config, *, hosted: bool = False) -> Any:  # noqa: PLR0915 
             _audit("verifier_salarie", salarie=salarie)
             return _json(out)
         except Exception as e:
-            return _error(e)
+            return _error(e, "comptine_verifier_salarie")
 
     @mcp.tool()
     def comptine_enfants_ouvrant_droit() -> str:
@@ -326,7 +333,7 @@ def build_server(cfg: Config, *, hosted: bool = False) -> Any:  # noqa: PLR0915 
             _audit("enfants_ouvrant_droit")
             return _json(out)
         except Exception as e:
-            return _error(e)
+            return _error(e, "comptine_enfants_ouvrant_droit")
 
     @mcp.tool()
     def comptine_estimer(salarie: str, mois: str, heures: str = "mensualisation") -> str:
@@ -343,7 +350,7 @@ def build_server(cfg: Config, *, hosted: bool = False) -> Any:  # noqa: PLR0915 
             _audit("estimer", salarie=salarie, mois=mois, corps=body)
             return _json({"envoye": body, "estimation": out, "salarie": s.nom})
         except Exception as e:
-            return _error(e)
+            return _error(e, "comptine_estimer")
 
     @mcp.tool()
     def comptine_apercu(salarie: str, mois: str, heures: str = "mensualisation") -> str:
@@ -353,7 +360,7 @@ def build_server(cfg: Config, *, hosted: bool = False) -> Any:  # noqa: PLR0915 
             body, _, _, _ = _build_declaration(cfg, salarie, mois, heures, hosted=hosted)
             return _json({"apercu": True, "corps": body})
         except Exception as e:
-            return _error(e)
+            return _error(e, "comptine_apercu")
 
     @mcp.tool()
     def comptine_predeclarer(salarie: str, mois: str, heures: str = "mensualisation") -> str:
@@ -381,7 +388,7 @@ def build_server(cfg: Config, *, hosted: bool = False) -> Any:  # noqa: PLR0915 
                 }
             )
         except Exception as e:
-            return _error(e)
+            return _error(e, "comptine_predeclarer")
 
     @mcp.tool()
     def comptine_declarer(
@@ -416,7 +423,7 @@ def build_server(cfg: Config, *, hosted: bool = False) -> Any:  # noqa: PLR0915 
         except DeclarationWindowError as e:
             return _json({"erreur": {"type": "FenetreFermee", "message": str(e)}})
         except Exception as e:
-            return _error(e)
+            return _error(e, "comptine_declarer")
 
     return mcp
 
