@@ -248,11 +248,36 @@ def _error(e: Exception, tool: str) -> str:
 # --- the server -------------------------------------------------------------------
 
 
+def _transport_security() -> dict[str, Any]:
+    """Declare the public hostnames, when the server sits behind a proxy.
+
+    The SDK protects against DNS rebinding by refusing any ``Host`` it was not
+    told about, which is why a server published under a real domain answers 421
+    « Invalid Host header » until the name is declared. Rather than switch the
+    protection off, name the hosts: ``COMPTINE_ALLOWED_HOSTS=comptine.example.org``.
+    """
+    raw = os.environ.get("COMPTINE_ALLOWED_HOSTS", "")
+    hosts = [h.strip() for h in raw.split(",") if h.strip()]
+    if not hosts:
+        return {}
+    from mcp.server.transport_security import (  # noqa: PLC0415 — optional extra
+        TransportSecuritySettings,
+    )
+
+    local = ["127.0.0.1", "localhost", "127.0.0.1:8788", "localhost:8788"]
+    return {
+        "transport_security": TransportSecuritySettings(
+            allowed_hosts=[*hosts, *local],
+            allowed_origins=[*(f"https://{h}" for h in hosts), *(f"http://{h}" for h in local)],
+        )
+    }
+
+
 def build_server(cfg: Config, *, hosted: bool = False) -> Any:  # noqa: PLR0915 — one function per tool, FastMCP style
     """Build the FastMCP server. Imported lazily so the package works without the MCP extra."""
     from mcp.server.fastmcp import FastMCP  # noqa: PLC0415 — optional extra, imported on demand
 
-    mcp = FastMCP("comptine")
+    mcp = FastMCP("comptine", **_transport_security())
 
     @mcp.tool()
     def comptine_etat() -> str:

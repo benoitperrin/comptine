@@ -166,8 +166,13 @@ Cowork ou mobile.
 
 ```bash
 comptine-mcp --nouveau-compte "Claire Dupont" --employeur claire   # rend un jeton, une fois
-comptine-mcp --http --port 8787
+COMPTINE_ALLOWED_HOSTS=comptine.example.org comptine-mcp --http --port 8787
 ```
+
+Derrière un proxy ou un tunnel, `COMPTINE_ALLOWED_HOSTS` est obligatoire : le SDK MCP
+refuse tout `Host` qu'on ne lui a pas déclaré, par protection contre le DNS rebinding,
+et répond sinon `421 Invalid Host header`. On nomme les hôtes, on ne désactive pas la
+protection.
 
 Le jeton n'est jamais stocké : la configuration ne garde que son empreinte SHA-256, et
 un compte est lié à un employeur et un seul. Sans jeton valide, le serveur refuse —
