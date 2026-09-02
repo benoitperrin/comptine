@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+.python-version
+
+# Test / coverage
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+coverage.xml
+
+# Editor
+.idea/
+.vscode/
+*.swp
+
+# OS
+.DS_Store
+
+# Secrets and local config — NEVER commit
+.env
+.env.*
+*.credentials.json
+*.token.json
+config.local.*
+secrets/
+credentials/
+
+# Recorded HTTP responses with real data
+tests/fixtures/recorded/*.json
+!tests/fixtures/recorded/.gitkeep
+
+# Logs
+*.log
+logs/
