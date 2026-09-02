@@ -185,8 +185,13 @@ tiers déclarant toute contestation.
 
 ## Vous n'avez pas d'accès et vous voulez quand même passer par l'API
 
-Sépharée SAS est référencée comme tiers déclarant et peut déposer les déclarations d'un
-particulier employeur qui lui donne mandat. C'est artisanal et volontairement limité : pas de
+Le logiciel est édité par **Atlantique Logiciel** ; le service, lui, est opéré par
+**Sépharée SAS**, qui est la société référencée par l'Urssaf comme tiers déclarant et
+qui porte le mandat. C'est ce second nom qui apparaîtra dans le courriel que l'Urssaf
+vous enverra pour confirmer la délégation.
+
+Sépharée peut donc déposer les déclarations d'un particulier employeur qui lui donne
+mandat. C'est artisanal et volontairement limité : pas de
 formulaire, pas d'inscription automatique, quelques dossiers à la fois, à titre gratuit, et
 sans engagement de délai.
 
